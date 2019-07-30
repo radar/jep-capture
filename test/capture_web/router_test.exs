@@ -10,7 +10,7 @@ defmodule CaptureWeb.RouterTest do
 
   describe "with a response already" do
     setup do
-      %Response{survey_id: 1, question_id: 1, strongly_agree: 3}
+      %Response{survey_id: 1, question_id: 1, value: 3, response_id: 5}
       |> Repo.insert!()
 
       :ok
@@ -20,8 +20,8 @@ defmodule CaptureWeb.RouterTest do
       params = %{
         survey_id: 1,
         question_id: 1,
-        previous_answer: nil,
-        selected_answer: 5
+        previous_response_id: nil,
+        response_id: 5
       }
 
       conn =
@@ -36,7 +36,7 @@ defmodule CaptureWeb.RouterTest do
         |> Responses.for_question(1)
         |> Repo.one()
 
-      assert response.strongly_agree == 4
+      assert response.value == 4
     end
   end
 
@@ -45,8 +45,8 @@ defmodule CaptureWeb.RouterTest do
       params = %{
         survey_id: 1,
         question_id: 1,
-        previous_answer: nil,
-        selected_answer: 2
+        previous_response_id: nil,
+        response_id: 2
       }
 
       conn =
@@ -58,18 +58,23 @@ defmodule CaptureWeb.RouterTest do
       response =
         Response
         |> Responses.for_survey(1)
+        |> IO.inspect(label: "before")
         |> Responses.for_question(1)
+        |> IO.inspect(label: "middle")
         |> Repo.one()
+        |> IO.inspect(label: "after")
 
       assert response.survey_id == 1
       assert response.question_id == 1
-      assert response.disagree == 1
+      assert response.response_id == 2
     end
   end
-
-  describe "with an updated response" do
+   describe "with an updated response" do
     setup do
-      %Response{survey_id: 1, question_id: 1, disagree: 1, neutral: 1}
+      %Response{survey_id: 1, question_id: 1, value: 1, response_id: 2}
+      |> Repo.insert!()
+
+      %Response{survey_id: 1, question_id: 1, value: 1, response_id: 3}
       |> Repo.insert!()
 
       :ok
@@ -79,8 +84,8 @@ defmodule CaptureWeb.RouterTest do
       params = %{
         survey_id: 1,
         question_id: 1,
-        previous_answer: 2,
-        selected_answer: 3
+        previous_response_id: 2,
+        response_id: 3
       }
 
       conn =
@@ -97,8 +102,8 @@ defmodule CaptureWeb.RouterTest do
 
       assert response.survey_id == 1
       assert response.question_id == 1
-      assert response.disagree == 0
-      assert response.neutral == 2
+      assert response.previous_response_id == 2
+      assert response.response_id == 3
     end
   end
 end
