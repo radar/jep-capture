@@ -3,25 +3,31 @@ defmodule CaptureWeb.Router do
 
   alias Capture.{Response, Responses, Repo}
 
-  plug :match
-  plug :dispatch
+  plug(:match)
+  plug(:dispatch)
 
   post "/responses" do
-    %{"survey_id" => survey_id, "question_id" => question_id, "selected_answer" => selected_answer} = conn.params
+    %{
+      "survey_id" => survey_id,
+      "question_id" => question_id,
+      "selected_answer" => selected_answer
+    } = conn.params
 
-    query = Response
-    |> Responses.for_survey(survey_id)
-    |> Responses.for_question(question_id)
+    query =
+      Response
+      |> Responses.for_survey(survey_id)
+      |> Responses.for_question(question_id)
 
     query
-    |> Repo.one
+    |> Repo.one()
     |> case do
       nil ->
         %Response{survey_id: survey_id, question_id: question_id}
         |> Map.merge(%{convertSelectedAnswer(selected_answer) => 1})
-        |> Capture.Repo.insert
+        |> Capture.Repo.insert()
+
       %Response{} = response ->
-        update = %{convertSelectedAnswer(selected_answer) => 1} |> Keyword.new
+        update = %{convertSelectedAnswer(selected_answer) => 1} |> Keyword.new()
         Repo.update_all(query, inc: update)
     end
 

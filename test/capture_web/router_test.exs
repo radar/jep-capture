@@ -11,7 +11,7 @@ defmodule CaptureWeb.RouterTest do
   describe "with a response already" do
     setup do
       %Response{survey_id: 1, question_id: 1, strongly_agree: 3}
-      |> Repo.insert!
+      |> Repo.insert!()
 
       :ok
     end
@@ -23,15 +23,17 @@ defmodule CaptureWeb.RouterTest do
         selected_answer: 5
       }
 
-      conn = conn(:post, "/responses", params)
-      |> CaptureWeb.Router.call(@opts)
+      conn =
+        conn(:post, "/responses", params)
+        |> CaptureWeb.Router.call(@opts)
 
       assert conn.status == 200
 
-      response = Response
-      |> Responses.for_survey(1)
-      |> Responses.for_question(1)
-      |> Repo.one
+      response =
+        Response
+        |> Responses.for_survey(1)
+        |> Responses.for_question(1)
+        |> Repo.one()
 
       assert response.strongly_agree == 4
     end
@@ -40,23 +42,29 @@ defmodule CaptureWeb.RouterTest do
   describe "with no responses" do
     test "creates a record" do
       params = %{
-        survey_id: 3,
+        survey_id: 1,
         question_id: 1,
-        selected_answer: 1
+        selected_answer: 2
       }
 
-      conn = conn(:post, "/responses", params)
-      |> CaptureWeb.Router.call(@opts)
+      conn =
+        conn(:post, "/responses", params)
+        |> CaptureWeb.Router.call(@opts)
 
       assert conn.status == 200
 
-      response = Response
-      |> Responses.for_survey(3)
-      |> Repo.one
+      response =
+        Response
+        |> Responses.for_survey(1)
+        |> IO.inspect(label: "before")
+        |> Responses.for_question(1)
+        |> IO.inspect(label: "middle")
+        |> Repo.one()
+        |> IO.inspect(label: "after")
 
-      assert response.survey_id == 3
+      assert response.survey_id == 1
       assert response.question_id == 1
-      assert response.strongly_disagree == 1
+      assert response.disagree == 1
     end
   end
 end
