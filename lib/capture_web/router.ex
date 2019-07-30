@@ -10,6 +10,7 @@ defmodule CaptureWeb.Router do
     %{
       "survey_id" => survey_id,
       "question_id" => question_id,
+      "previous_answer" => previous_answer,
       "selected_answer" => selected_answer
     } = conn.params
 
@@ -27,8 +28,14 @@ defmodule CaptureWeb.Router do
         |> Capture.Repo.insert()
 
       %Response{} = response ->
-        update = %{convertSelectedAnswer(selected_answer) => 1} |> Keyword.new()
-        Repo.update_all(query, inc: update)
+        case previous_answer do
+          nil ->
+            update = %{convertSelectedAnswer(selected_answer) => 1} |> Keyword.new() 
+            Repo.update_all(query, inc: update)
+          _ ->
+            update = %{convertSelectedAnswer(selected_answer) => 1, convertSelectedAnswer(previous_answer) => (-1)} |> Keyword.new() 
+            Repo.update_all(query, inc: update)
+        end
     end
 
     send_resp(conn, 200, "OK")

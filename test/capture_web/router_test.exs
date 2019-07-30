@@ -20,6 +20,7 @@ defmodule CaptureWeb.RouterTest do
       params = %{
         survey_id: 1,
         question_id: 1,
+        previous_answer: nil,
         selected_answer: 5
       }
 
@@ -44,6 +45,7 @@ defmodule CaptureWeb.RouterTest do
       params = %{
         survey_id: 1,
         question_id: 1,
+        previous_answer: nil,
         selected_answer: 2
       }
 
@@ -67,7 +69,7 @@ defmodule CaptureWeb.RouterTest do
 
   describe "with an updated response" do
     setup do
-      %Response{survey_id: 1, question_id: 1, disagree: 1}
+      %Response{survey_id: 1, question_id: 1, disagree: 1, neutral: 1}
       |> Repo.insert!()
 
       :ok
@@ -78,7 +80,7 @@ defmodule CaptureWeb.RouterTest do
         survey_id: 1,
         question_id: 1,
         previous_answer: 2,
-        updated_answer: 3
+        selected_answer: 3
       }
 
       conn =
@@ -96,7 +98,7 @@ defmodule CaptureWeb.RouterTest do
       assert response.survey_id == 1
       assert response.question_id == 1
       assert response.disagree == 0
-      assert response.neutral == 1
+      assert response.neutral == 2
     end
   end
 end
