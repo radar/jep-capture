@@ -8,20 +8,13 @@ defmodule CaptureWeb.RouterTest do
 
   @opts Router.init([])
 
-  describe "with a response already" do
-    setup do
-      %Response{survey_id: 1, question_id: 1, value: 3, response_id: 5}
-      |> Repo.insert!()
-
-      :ok
-    end
-
-    test "updates the existing record" do
+  describe "when survey, question & response_id combo does not exist" do
+    test "creates a new record" do
       params = %{
         survey_id: 1,
         question_id: 1,
-        previous_response_id: nil,
-        response_id: 5
+        response_id: 12345,
+        value: 1
       }
 
       conn =
@@ -35,57 +28,25 @@ defmodule CaptureWeb.RouterTest do
         |> Responses.for_survey(1)
         |> Responses.for_question(1)
         |> Repo.one()
+        |> IO.inspect(label: "blah")
 
-      assert response.value == 4
+      assert response.value == 1
     end
   end
 
-  describe "with no responses" do
-    test "creates a record" do
-      params = %{
-        survey_id: 1,
-        question_id: 1,
-        previous_response_id: nil,
-        response_id: 2
-      }
-
-      conn =
-        conn(:post, "/responses", params)
-        |> CaptureWeb.Router.call(@opts)
-
-      assert conn.status == 200
-
-      response =
-        Response
-        |> Responses.for_survey(1)
-        |> IO.inspect(label: "before")
-        |> Responses.for_question(1)
-        |> IO.inspect(label: "middle")
-        |> Repo.one()
-        |> IO.inspect(label: "after")
-
-      assert response.survey_id == 1
-      assert response.question_id == 1
-      assert response.response_id == 2
-    end
-  end
-   describe "with an updated response" do
+   describe "when survey, question & response_id combo does exist" do
     setup do
-      %Response{survey_id: 1, question_id: 1, value: 1, response_id: 2}
+      %Response{survey_id: 1, question_id: 1, response_id: 12345, value: 1}
       |> Repo.insert!()
-
-      %Response{survey_id: 1, question_id: 1, value: 1, response_id: 3}
-      |> Repo.insert!()
-
       :ok
     end
 
-    test "updates the database with the correct response amount" do
+    test "updates record with new value property" do
       params = %{
         survey_id: 1,
         question_id: 1,
-        previous_response_id: 2,
-        response_id: 3
+        response_id: 12345,
+        value: 2
       }
 
       conn =
@@ -102,8 +63,8 @@ defmodule CaptureWeb.RouterTest do
 
       assert response.survey_id == 1
       assert response.question_id == 1
-      assert response.previous_response_id == 2
-      assert response.response_id == 3
+      assert response.response_id == 12345
+      assert response.value == 2
     end
   end
 end
