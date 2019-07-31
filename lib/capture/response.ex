@@ -2,9 +2,9 @@ defmodule Capture.Response do
   use Ecto.Schema
 
   schema "responses" do
-    field(:survey_id, :integer)
-    field(:question_id, :integer)
-    field(:response_id, :integer)
+    field(:survey_id, :string)
+    field(:question_id, :string)
+    field(:response_id, :string)
     field(:value, :integer)
   end
 end
