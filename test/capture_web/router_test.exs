@@ -8,55 +8,55 @@ defmodule CaptureWeb.RouterTest do
 
   @opts Router.init([])
 
-  describe "with a response already" do
-    setup do
-      %Response{survey_id: 1, question_id: 1, strongly_agree: 3}
-      |> Repo.insert!
+  test "takes a response from a user" do
+    params = %{
+      survey_id: 3,
+      question_id: 1,
+      response_id: 1,
+      value: 5,
+    }
 
-      :ok
-    end
+    conn = conn(:post, "/responses", params)
+    |> CaptureWeb.Router.call(@opts)
 
-    test "updates the existing record" do
-      params = %{
-        survey_id: 1,
-        question_id: 1,
-        selected_answer: 5
-      }
+    assert conn.status == 200
 
-      conn = conn(:post, "/responses", params)
-      |> CaptureWeb.Router.call(@opts)
+    response = Response
+    |> Responses.for_survey(3)
+    |> Responses.for_question(1)
+    |> Responses.for_response(1)
+    |> Repo.one
 
-      assert conn.status == 200
-
-      response = Response
-      |> Responses.for_survey(1)
-      |> Responses.for_question(1)
-      |> Repo.one
-
-      assert response.strongly_agree == 4
-    end
+    assert response.value == 5
   end
 
-  describe "with no responses" do
-    test "creates a record" do
-      params = %{
-        survey_id: 3,
-        question_id: 1,
-        selected_answer: 1
-      }
-
-      conn = conn(:post, "/responses", params)
-      |> CaptureWeb.Router.call(@opts)
-
-      assert conn.status == 200
-
-      response = Response
-      |> Responses.for_survey(3)
-      |> Repo.one
-
-      assert response.survey_id == 3
-      assert response.question_id == 1
-      assert response.strongly_disagree == 1
+  describe "with an existing response" do
+    setup do
+      %Response{survey_id: 1, question_id: 1, response_id: 123, value: 1}
+      |> Repo.insert!()
+      :ok
     end
+      test "updates the value" do
+
+        params = %{
+          survey_id: 1,
+          question_id: 1,
+          response_id: 123,
+          value: 5,
+        }
+
+        conn = conn(:post, "/responses", params)
+        |> CaptureWeb.Router.call(@opts)
+
+        assert conn.status == 200
+
+        response = Response
+        |> Responses.for_survey(1)
+        |> Responses.for_question(1)
+        |> Responses.for_response(123)
+        |> Repo.one
+
+        assert response.value == 5
+      end
   end
 end

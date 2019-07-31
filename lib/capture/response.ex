@@ -4,10 +4,12 @@ defmodule Capture.Response do
   schema "responses" do
     field :survey_id, :integer
     field :question_id, :integer
-    field :strongly_disagree, :integer
-    field :disagree, :integer
-    field :neutral, :integer
-    field :agree, :integer
-    field :strongly_agree, :integer
+    field :response_id, :integer
+    field :value, :integer
+
+    def changeset(response, params \\ %{}) do
+      response
+      |> Ecto.Changeset.change(params)
+    end
   end
 end

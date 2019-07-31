@@ -5,11 +5,8 @@ defmodule Capture.Repo.Migrations.CreateResponses do
     create table(:responses) do
       add :survey_id, :integer
       add :question_id, :integer
-      add :strongly_agree, :integer
-      add :agree, :integer
-      add :neutral, :integer
-      add :disagree, :integer
-      add :strongly_disagree, :integer
+      add :response_id, :integer
+      add :value, :integer
     end
   end
 end
