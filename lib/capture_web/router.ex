@@ -1,10 +1,14 @@
 defmodule CaptureWeb.Router do
   use Plug.Router
 
-  alias Capture.{Response, Responses, Repo}
+  plug Plug.Logger, log: :debug
+  plug Plug.Parsers, parsers: [:urlencoded, :json],
+  json_decoder: Jason
 
   plug :match
   plug :dispatch
+
+  alias Capture.{Response, Responses, Repo}
 
   post "/responses" do
     %{"survey_id" => survey_id, "question_id" => question_id, "selected_answer" => selected_answer} = conn.params
