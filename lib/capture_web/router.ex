@@ -46,22 +46,23 @@ defmodule CaptureWeb.Router do
     send_resp(conn, 200, "OK")
   end
 
-  def query_selector(responses, conn) do
-    case conn.params["question_id"] do
-      nil ->
-        responses
-      _ ->
-        responses
-        |> Responses.for_question(conn.params["question_id"])
-    end
+  def query_selector(responses, "" <> question_id) do
+      responses
+      |> Responses.for_question(question_id)
+  end
+
+  def query_selector(responses, _) do
+      responses
   end
 
   get "/responses" do
+    question_id = conn.params["question_id"]
+
     tally =
       Enum.map([1, 2, 3, 4, 5], fn value ->
         Response
         |> Responses.for_survey(conn.params["survey_id"])
-        |> query_selector(conn)
+        |> query_selector(question_id)
         |> Responses.for_value(value)
         |> Responses.count_responses()
         |> Repo.one()
