@@ -20,4 +20,5 @@ defmodule Capture.Responses do
   def count_responses(responses) do
     responses |> select([responses], count(responses.id))
   end
+
 end
