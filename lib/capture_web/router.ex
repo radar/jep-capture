@@ -47,17 +47,19 @@ defmodule CaptureWeb.Router do
   end
 
   get "/responses" do
-    query =
-      Response
+  
+  tally = Enum.map([1,2,3,4,5], fn value ->  
+    Response
       |> Responses.for_survey(conn.params["survey_id"])
-      |> Responses.for_value(1)
+      |> Responses.for_value(value)
       |> Responses.count_responses()
       |> Repo.one()
-
-    IO.inspect(query, label: "QUERY")
-    IO.inspect(conn.params, label: "CONN")
-
-    send_resp(conn, 200, "OK")
+    end
+  )
+  response_body = "{strongly-disagree: #{Enum.at(tally,0)}, disagree: #{Enum.at(tally,1)}, neutral: #{Enum.at(tally,2)}, 
+  agree: #{Enum.at(tally,3)}, strongly-agree: #{Enum.at(tally,4)}}"
+  resp(conn, 200, response_body)
+  
   end
 
   def convertSelectedAnswer(answer) do
