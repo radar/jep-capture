@@ -1,9 +1,12 @@
 defmodule CaptureWeb.Router do
   use Plug.Router
 
-  plug Plug.Logger, log: :debug
-  plug Plug.Parsers, parsers: [:urlencoded, :json],
-  json_decoder: Jason
+  plug(Plug.Logger, log: :debug)
+
+  plug(Plug.Parsers,
+    parsers: [:urlencoded, :json],
+    json_decoder: Jason
+  )
 
   alias Capture.{Response, Responses, Repo}
 
@@ -15,7 +18,7 @@ defmodule CaptureWeb.Router do
       "survey_id" => survey_id,
       "question_id" => question_id,
       "response_id" => response_id,
-      "value" => value,
+      "value" => value
     } = conn.params
 
     query =
@@ -28,7 +31,12 @@ defmodule CaptureWeb.Router do
     |> Repo.one()
     |> case do
       nil ->
-        %Response{survey_id: survey_id, question_id: question_id, response_id: response_id, value: value}
+        %Response{
+          survey_id: survey_id,
+          question_id: question_id,
+          response_id: response_id,
+          value: value
+        }
         |> Capture.Repo.insert()
 
       %Response{} = response ->
@@ -38,21 +46,20 @@ defmodule CaptureWeb.Router do
     send_resp(conn, 200, "OK")
   end
 
-  get "/testing" do
+  get "/responses" do
     query =
       Response
-      |> Responses.for_survey("5d392ccf65096b31499ce7da")
-      |> Repo.all()
+      |> Responses.for_survey(conn.params["survey_id"])
+      |> Responses.for_value(1)
+      |> Responses.count_responses()
+      |> Repo.one()
 
     IO.inspect(query, label: "QUERY")
-    IO.inspect(conn, label: "CONN")
+    IO.inspect(conn.params, label: "CONN")
 
     send_resp(conn, 200, "OK")
-    # Post |> group_by([p], p.category) |> select([p], count(p.id))
   end
 
-  @spec convertSelectedAnswer(1 | 2 | 3 | 4 | 5) ::
-          :agree | :disagree | :neutral | :strongly_agree | :strongly_disagree
   def convertSelectedAnswer(answer) do
     case answer do
       1 -> :strongly_disagree
