@@ -47,37 +47,42 @@ defmodule CaptureWeb.Router do
   end
 
   get "/responses" do
-  
-  tally = Enum.map([1,2,3,4,5], fn value ->  
-    Response
-      |> Responses.for_survey(conn.params["survey_id"])
-      |> Responses.for_value(value)
-      |> Responses.count_responses()
-      |> Repo.one()
-    end
-  )
-  response_body = "{strongly-disagree: #{Enum.at(tally,0)}, disagree: #{Enum.at(tally,1)}, neutral: #{Enum.at(tally,2)}, 
-  agree: #{Enum.at(tally,3)}, strongly-agree: #{Enum.at(tally,4)}}"
-  resp(conn, 200, response_body)
-  
+    tally =
+      Enum.map([1, 2, 3, 4, 5], fn value ->
+        Response
+        |> Responses.for_survey(conn.params["survey_id"])
+        |> Responses.for_value(value)
+        |> Responses.count_responses()
+        |> Repo.one()
+      end)
+
+    response_body =
+      "{strongly-disagree: #{Enum.at(tally, 0)}, disagree: #{Enum.at(tally, 1)}, neutral: #{
+        Enum.at(tally, 2)
+      }, 
+    agree: #{Enum.at(tally, 3)}, strongly-agree: #{Enum.at(tally, 4)}}"
+
+    resp(conn, 200, response_body)
   end
 
-
   get "/responses_per_question" do
-  
-  tally = Enum.map([1,2,3,4,5], fn value ->  
-    Response
-      |> Responses.for_survey(conn.params["survey_id"])
-      |> Responses.for_question(conn.params["question_id"])
-      |> Responses.for_value(value)
-      |> Responses.count_responses()
-      |> Repo.one()
-    end
-  )
-  response_body = "{strongly-disagree: #{Enum.at(tally,0)}, disagree: #{Enum.at(tally,1)}, neutral: #{Enum.at(tally,2)}, 
-  agree: #{Enum.at(tally,3)}, strongly-agree: #{Enum.at(tally,4)}}"
-  resp(conn, 200, response_body)
-  
+    tally =
+      Enum.map([1, 2, 3, 4, 5], fn value ->
+        Response
+        |> Responses.for_survey(conn.params["survey_id"])
+        |> Responses.for_question(conn.params["question_id"])
+        |> Responses.for_value(value)
+        |> Responses.count_responses()
+        |> Repo.one()
+      end)
+
+    response_body =
+      "{strongly-disagree: #{Enum.at(tally, 0)}, disagree: #{Enum.at(tally, 1)}, neutral: #{
+        Enum.at(tally, 2)
+      }, 
+    agree: #{Enum.at(tally, 3)}, strongly-agree: #{Enum.at(tally, 4)}}"
+
+    resp(conn, 200, response_body)
   end
 
   def convertSelectedAnswer(answer) do

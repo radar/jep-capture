@@ -8,7 +8,7 @@ defmodule Capture.Application do
   def start(_type, _args) do
     children = [
       {Plug.Cowboy, scheme: :http, plug: CaptureWeb.Router, options: [port: 8080]},
-      Capture.Repo,
+      Capture.Repo
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

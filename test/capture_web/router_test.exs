@@ -34,10 +34,11 @@ defmodule CaptureWeb.RouterTest do
     end
   end
 
-   describe "when survey, question & response_id combo does exist" do
+  describe "when survey, question & response_id combo does exist" do
     setup do
       %Response{survey_id: 1, question_id: 1, response_id: 12345, value: 1}
       |> Repo.insert!()
+
       :ok
     end
 
