@@ -38,6 +38,21 @@ defmodule CaptureWeb.Router do
     send_resp(conn, 200, "OK")
   end
 
+  get "/testing" do
+    query =
+      Response
+      |> Responses.for_survey("5d392ccf65096b31499ce7da")
+      |> Repo.all()
+
+    IO.inspect(query, label: "QUERY")
+    IO.inspect(conn, label: "CONN")
+
+    send_resp(conn, 200, "OK")
+    # Post |> group_by([p], p.category) |> select([p], count(p.id))
+  end
+
+  @spec convertSelectedAnswer(1 | 2 | 3 | 4 | 5) ::
+          :agree | :disagree | :neutral | :strongly_agree | :strongly_disagree
   def convertSelectedAnswer(answer) do
     case answer do
       1 -> :strongly_disagree
