@@ -69,10 +69,10 @@ defmodule CaptureWeb.Router do
       end)
 
     response_body =
-      "{strongly-disagree: #{Enum.at(tally, 0)}, disagree: #{Enum.at(tally, 1)}, neutral: #{
+      '{"strongly-disagree": #{Enum.at(tally, 0)}, "disagree": #{Enum.at(tally, 1)}, "neutral": #{
         Enum.at(tally, 2)
-      }, 
-    agree: #{Enum.at(tally, 3)}, strongly-agree: #{Enum.at(tally, 4)}}"
+      },
+    "agree": #{Enum.at(tally, 3)}, "strongly-agree": #{Enum.at(tally, 4)}}'
 
     resp(conn, 200, response_body)
   end
